@@ -1,16 +1,20 @@
 # Sentence Bingo — 日本語作文ビンゴ
 
-Japanese sentence-writing bingo, with three randomly selected station jingles.
+A Japanese sentence-writing bingo app. It stores cards in this browser's local storage; export a JSON backup regularly if you want to keep your data.
 
-## Publish with GitHub Pages
-Upload **all files in this folder** to the repository root, then go to **Settings → Pages** and select **Deploy from a branch**, branch `main`, folder `/(root)`.
+## Publish on GitHub Pages
 
-## Included
-- `index.html` — app
-- `shinjuku_station_3.mp3`, `tokyo_station_3.mp3`, `akihabara_train_song.mp3` — randomly played bingo jingles
-- `icon.svg`, `icon-192.png`, `icon-512.png`, `manifest.webmanifest` — app icons and web manifest
+Upload **all files in this folder** to the repository root (not the folder itself), then commit. In GitHub Pages settings, publish the `main` branch from `/ (root)`.
 
-Cards are stored in this browser's local storage. Export JSON backups from the app for safekeeping.
+## Install on Android Chrome
 
-## Card sizes
-Choose a size before creating a new card: 3×3, 4×4, 5×5, 5×6, or 6×6. Each archived card keeps its own size. Creating a card immediately adds it without a confirmation pop-up; the previous cards remain in the archive.
+1. Open the published HTTPS GitHub Pages URL in Chrome.
+2. Open Chrome's ⋮ menu.
+3. Choose **Install app** (or **Add to Home screen**, depending on Chrome version).
+4. Confirm. The app opens in a standalone window from the home-screen icon.
+
+The site includes a web app manifest and service worker for installation and offline app-shell/audio caching. The first visit needs an internet connection.
+
+## Files
+
+Keep `index.html`, `manifest.webmanifest`, `sw.js`, the icons, and the three MP3 files together at the repository root. The app uses relative paths so it works from a GitHub Pages project site.

@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f8e4ed">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon-192.png">
 <title>Sentence Bingo — 日本語作文ビンゴ</title>
 <style>
 :root{--rose:#b65f83;--pink:#f8e4ed;--pink2:#f3cbdc;--line:#efd6e1;--ink:#493943;--muted:#927b87}
@@ -86,4 +90,9 @@ $('restore').onclick=()=> $('backupFile').click();
 $('backupFile').onchange=async ev=>{const file=ev.target.files?.[0];if(!file)return;try{const raw=JSON.parse(await file.text()),incoming=raw.data||raw;if(!incoming||!Array.isArray(incoming.cards)||!incoming.cards.length)throw new Error('Invalid backup');const valid=incoming.cards.every(c=>Number.isInteger(c.id)&&Array.isArray(c.squares)&&c.squares.length===((Number(c.rows)||5)*(Number(c.cols)||6))&&c.squares.every(s=>s&&typeof s.sentence==='string'&&typeof s.keyword==='string'));if(!valid)throw new Error('Invalid card data');if(!confirm('Import this backup? It will replace the cards currently saved in this browser. Export your current cards first if you want to keep them.'))return;db={next:Math.max(Number(incoming.next)||1,...incoming.cards.map(c=>c.id+1)),current:incoming.cards.some(c=>c.id===incoming.current)?incoming.current:incoming.cards[0].id,cards:incoming.cards};selected=0;previous=new Set(bingoLines().map(x=>x.join(',')));fullDone=card().squares.every(filled);persist();render();toast('Backup restored.')}catch(e){toast('That file is not a valid Sentence Bingo backup.')}finally{ev.target.value=''}};
 previous=new Set(bingoLines().map(x=>x.join(',')));fullDone=card().squares.every(filled);render();
 })();
+</script>
+<script>
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+}
 </script></body></html>
