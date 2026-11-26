@@ -11,3 +11,6 @@ Upload **all files in this folder** to the repository root, then go to **Setting
 - `icon.svg`, `icon-192.png`, `icon-512.png`, `manifest.webmanifest` — app icons and web manifest
 
 Cards are stored in this browser's local storage. Export JSON backups from the app for safekeeping.
+
+## Card sizes
+Choose a size before creating a new card: 3×3, 4×4, 5×5, 5×6, or 6×6. Each archived card keeps its own size. Creating a card immediately adds it without a confirmation pop-up; the previous cards remain in the archive.
