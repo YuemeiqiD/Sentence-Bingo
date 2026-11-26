@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sentence Bingo — 日本語作文ビンゴ</title>\n<link rel="icon" href="./icon.svg" type="image/svg+xml">\n<link rel="apple-touch-icon" href="./icon-192.png">\n<link rel="manifest" href="./manifest.webmanifest">\n<meta name="theme-color" content="#f8e4ed">
+<style>
+:root{--rose:#b65f83;--pink:#f8e4ed;--pink2:#f3cbdc;--line:#efd6e1;--ink:#493943;--muted:#927b87}
+*{box-sizing:border-box}body{margin:0;background:#fffafb;color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Noto Sans JP",sans-serif}
+main{max-width:980px;margin:auto;padding:24px 18px 48px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);margin:0;color:var(--rose)}.jp{color:#a8758c;font-size:.95rem;margin-top:4px}
+button,select,input,textarea{font:inherit}button{border:1px solid var(--pink2);background:white;color:var(--rose);border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:600}
+button.primary{background:var(--rose);color:white;border-color:var(--rose)}button:disabled{opacity:.45;cursor:default}
+.cardhead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:16px 0 12px}
+.cardhead h2{margin:0;font-size:1.2rem}.meta{font-size:.85rem;color:var(--muted);margin-top:3px}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.tools select{border:1px solid var(--line);border-radius:10px;padding:9px;background:white;color:var(--ink)}
+.progress{height:7px;background:#f7edf2;border-radius:99px;overflow:hidden;margin:14px 0 18px}.progress span{display:block;height:100%;width:0;background:var(--pink2);transition:width .3s}
+.grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.cell{aspect-ratio:1;border:1px solid var(--line);border-radius:12px;background:white;color:#b88da1;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;min-width:0;overflow:hidden;position:relative;font-size:clamp(.65rem,1.7vw,.95rem);font-weight:500;line-height:1.25;word-break:break-word}
+.cell.filled{background:#f9e7ef;color:#815269;border-color:#efcada}.cell.selected{outline:3px solid #d99bb7;outline-offset:1px}.cell.bingo{background:#f2cddd;border-color:#dba0bc}.cell .num{position:absolute;top:5px;left:6px;font-size:.65rem;color:#b995a7}.cell .check{position:absolute;right:5px;bottom:3px;color:#a75b7e;font-size:.7rem}
+.editor{margin-top:24px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 4px 20px #e9cdd822}
+.editor h3{margin:0 0 14px;font-size:1.05rem}.field{margin:12px 0}.field label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+textarea,input[type=text]{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fffdfd;color:var(--ink);outline-color:#d99bb7}
+textarea{min-height:112px;resize:vertical;font-size:1.05rem;line-height:1.6}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.hint{font-size:.82rem;color:var(--muted);margin-top:6px}
+.archive{margin-top:24px;border:1px solid var(--line);border-radius:16px;padding:16px;background:#fff}.archive h3{margin:0 0 12px}.archive-list{display:flex;gap:8px;flex-wrap:wrap}.archive-item{display:flex;gap:8px;align-items:center;background:#fff7fa;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.status{font-size:.8rem;color:var(--muted)}.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#80516a;color:white;padding:12px 18px;border-radius:14px;box-shadow:0 8px 30px #0002;z-index:10;opacity:0;pointer-events:none;transition:opacity .2s;text-align:center}.toast.show{opacity:1}
+.petals{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:20}.petal{position:absolute;top:-30px;width:16px;height:21px;background:#f4c6da;border-radius:75% 15% 75% 15%;opacity:.9;animation:fall linear forwards;transform:rotate(25deg)}
+@keyframes fall{to{transform:translate3d(var(--drift),110vh,0) rotate(720deg);opacity:.1}}
+.modal{position:fixed;inset:0;background:#4a2e3d66;display:none;align-items:center;justify-content:center;padding:18px;z-index:30}.modal.show{display:flex}.modalbox{background:#fffafb;border-radius:20px;padding:22px;max-width:420px;width:100%;text-align:center;border:1px solid var(--pink2)}.modalbox h2{color:var(--rose)}
+@media(max-width:560px){main{padding:16px 10px 36px}.grid{gap:5px}.cell{border-radius:8px;padding:3px}}
+</style>
+</head>
+<body><main>
+<header class="top"><div><h1>Sentence Bingo</h1><div class="jp">日本語作文ビンゴ</div></div><div class="row"><button id="backup">Export backup</button><button id="restore">Import backup</button><input id="backupFile" type="file" accept="application/json,.json" hidden><button id="newCard" class="primary">＋ New card</button></div></header>
+<section class="cardhead"><div><h2 id="cardTitle"></h2><div class="meta" id="started"></div></div><div class="tools"><span id="count" class="status"></span><select id="displayMode" aria-label="Square label"><option value="keyword">Show keyword</option><option value="beginning">Show sentence beginning</option></select></div></section>
+<div class="progress"><span id="progress"></span></div><div id="grid" class="grid" aria-label="Sentence bingo grid"></div>
+<section class="editor"><h3 id="squareTitle"></h3>
+<div id="emptyEditor">
+<div class="field"><label for="sentence">Japanese sentence</label><textarea id="sentence" lang="ja" placeholder="日本語の文を入力してください…"></textarea><div class="hint">Select a word or phrase in the sentence, then choose “Use selection” as the keyword.</div></div>
+<div class="row"><button id="useSelection">Use selection as keyword</button></div>
+<div class="field"><label for="keyword">Keyword or short label (optional)</label><input id="keyword" type="text" lang="ja" placeholder="例：きっかけ"></div>
+<div class="row"><button id="save" class="primary">Save sentence</button><button id="clearDraft">Clear</button></div></div>
+<div id="filledEditor" hidden>
+<div class="field"><label>Sentence</label><div id="shownSentence" style="font-size:1.08rem;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere"></div></div>
+<div class="row"><button id="speak" class="primary">▶ Read aloud</button><button id="stop">■ Stop</button><button id="edit">Edit</button><button id="remove">Clear square</button></div>
+<div class="field"><label for="editKeyword">Keyword / square label</label><input id="editKeyword" type="text" lang="ja" placeholder="Optional keyword"><div class="row" style="margin-top:8px"><button id="saveKeyword">Save keyword</button></div></div></div>
+</section>
+<section class="archive"><h3>Card archive</h3><div class="hint" style="margin:0 0 12px">Cards are saved on this device. Open an earlier card to revisit its sentences.</div><div id="archive" class="archive-list"></div></section>
+<div class="field" style="margin-top:18px"><label><input id="soundOn" type="checkbox" checked> Play original station-style jingle on bingo</label><div class="hint">Audio is synthesized in your browser. Tap “Test jingle” once to enable sound on mobile.</div><button id="testSound">Test jingle</button></div>
+</main><div class="petals" id="petals"></div><div class="toast" id="toast"></div><div class="modal" id="completeModal"><div class="modalbox"><h2>満開！ Full card complete!</h2><p>All 30 sentences are saved. おめでとうございます！</p><button id="closeModal" class="primary">Lovely!</button></div></div>
+<script>
+(()=> {
+const $=id=>document.getElementById(id), STORE='sentenceBingoApp_v1';
+function newCard(id){return {id,started:new Date().toISOString(),completed:null,squares:Array.from({length:30},()=>({sentence:'',keyword:''})),celebrated:[]}}
+function load(){try{const d=JSON.parse(localStorage.getItem(STORE));if(d?.cards?.length)return d}catch(e){}return {next:2,current:1,cards:[newCard(1)]}}
+let db=load(), selected=0, previous=new Set(), fullDone=false, audioCtx=null, toastTimer;
+const card=()=>db.cards.find(c=>c.id===db.current)||db.cards[0];
+const filled=s=>!!s.sentence.trim();
+const date=d=>new Date(d).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});
+function persist(){localStorage.setItem(STORE,JSON.stringify(db))}
+function label(s){if(!filled(s))return '';if($('displayMode').value==='beginning')return [...s.sentence].slice(0,11).join('')+(s.sentence.length>11?'…':'');return s.keyword.trim()||[...s.sentence].slice(0,11).join('')+(s.sentence.length>11?'…':'')}
+function bingoLines(){let a=[];for(let r=0;r<5;r++)for(let c=0;c<2;c++)a.push(Array.from({length:5},(_,k)=>r*6+c+k));for(let c=0;c<6;c++)a.push(Array.from({length:5},(_,r)=>r*6+c));for(let c=0;c<2;c++)a.push(Array.from({length:5},(_,k)=>k*6+c+k));for(let c=4;c<6;c++)a.push(Array.from({length:5},(_,k)=>k*6+c-k));return a.filter(line=>line.every(i=>filled(card().squares[i])))}
+function render(){const c=card(),n=c.squares.filter(filled).length;$('cardTitle').textContent=`Sentence Bingo #${String(c.id).padStart(3,'0')}`;$('started').textContent=`Started ${date(c.started)}${c.completed?' · Completed '+date(c.completed):''}`;$('count').textContent=`${n} / 30`;$('progress').style.width=n/30*100+'%';const won=bingoLines(),set=new Set(won.flat());$('grid').innerHTML='';
+c.squares.forEach((s,i)=>{let b=document.createElement('button');b.className='cell'+(filled(s)?' filled':'')+(i===selected?' selected':'')+(set.has(i)?' bingo':'');b.setAttribute('aria-label',`Square ${i+1}${filled(s)?': '+s.sentence:''}`);let t=document.createElement('span');t.textContent=label(s)||String(i+1);b.append(t);if(filled(s)){let check=document.createElement('span');check.className='check';check.textContent='✓';b.append(check)}b.onclick=()=>select(i);$('grid').append(b)});
+$('archive').innerHTML='';[...db.cards].sort((a,b)=>b.id-a.id).forEach(ca=>{let w=document.createElement('div');w.className='archive-item';let b=document.createElement('button');b.textContent='#'+String(ca.id).padStart(3,'0');b.onclick=()=>{db.current=ca.id;selected=0;previous=new Set(bingoLines().map(x=>x.join(',')));fullDone=card().squares.every(filled);persist();render();};let s=document.createElement('span');s.className='status';s.textContent=ca.squares.filter(filled).length+'/30'+(ca.completed?' ✓':'');w.append(b,s);$('archive').append(w)});selectUI()}
+function select(i){selected=i;render()}
+function selectUI(){let s=card().squares[selected];$('squareTitle').textContent=`Square ${selected+1} · ${filled(s)?'Filled':'Empty'}`;$('emptyEditor').hidden=filled(s);$('filledEditor').hidden=!filled(s);if(filled(s)){$('shownSentence').textContent=s.sentence;$('editKeyword').value=s.keyword||''}else{$('sentence').value='';$('keyword').value=''}}
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),2400)}
+function blossoms(count){const layer=$('petals');for(let i=0;i<count;i++){let p=document.createElement('i');p.className='petal';p.style.left=Math.random()*100+'%';p.style.setProperty('--drift',(Math.random()*220-110)+'px');p.style.animationDuration=(2.5+Math.random()*3)+'s';p.style.animationDelay=(Math.random()*.8)+'s';p.style.opacity=.45+Math.random()*.5;layer.append(p);setTimeout(()=>p.remove(),6500)}}
+function jingle(full=false){if(!$('soundOn').checked)return;try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();const now=audioCtx.currentTime,notes=full?[659.25,783.99,987.77,1174.66,987.77,1174.66,1567.98]:[587.33,739.99,880,1174.66];notes.forEach((f,i)=>{let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.setValueAtTime(f,now+i*.13);g.gain.setValueAtTime(.0001,now+i*.13);g.gain.exponentialRampToValueAtTime(full?.11:.09,now+i*.13+.018);g.gain.exponentialRampToValueAtTime(.0001,now+i*.13+(full?.27:.22));o.connect(g);g.connect(audioCtx.destination);o.start(now+i*.13);o.stop(now+i*.13+(full?.29:.24))})}catch(e){toast('Audio is unavailable in this browser.')}}
+function afterSave(){let c=card(),won=bingoLines(),now=new Set(won.map(x=>x.join(','))),newly=[...now].filter(x=>!previous.has(x));if(newly.length){newly.forEach(()=>jingle());blossoms(newly.length>1?60:32);toast(newly.length===1?'Bingo! 五つそろった！':`${newly.length} bingo lines!`)}previous=now;let complete=c.squares.every(filled);if(complete&&!fullDone){fullDone=true;c.completed=new Date().toISOString();jingle(true);blossoms(110);$('completeModal').classList.add('show')}persist();render()}
+$('useSelection').onclick=()=>{let el=$('sentence'),v=el.value.slice(el.selectionStart,el.selectionEnd).trim();if(v)$('keyword').value=v;else toast('Select a word or phrase in the sentence first.')};
+$('save').onclick=()=>{let v=$('sentence').value.trim();if(!v){toast('Enter a Japanese sentence first.');return}let s=card().squares[selected];s.sentence=v;s.keyword=$('keyword').value.trim();persist();afterSave()};
+$('clearDraft').onclick=()=>{$('sentence').value='';$('keyword').value=''};
+$('speak').onclick=()=>{if(!('speechSynthesis'in window)){toast('Japanese speech is not supported in this browser.');return}speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(card().squares[selected].sentence);u.lang='ja-JP';u.rate=.85;let voices=speechSynthesis.getVoices(),v=voices.find(x=>x.lang.toLowerCase().startsWith('ja'));if(v)u.voice=v;speechSynthesis.speak(u)};
+$('stop').onclick=()=>speechSynthesis?.cancel();$('edit').onclick=()=>{let s=card().squares[selected];$('sentence').value=s.sentence;$('keyword').value=s.keyword;$('emptyEditor').hidden=false;$('filledEditor').hidden=true;$('squareTitle').textContent=`Square ${selected+1} · Editing`};
+$('remove').onclick=()=>{card().squares[selected]={sentence:'',keyword:''};persist();render()};
+$('saveKeyword').onclick=()=>{card().squares[selected].keyword=$('editKeyword').value.trim();persist();render()};
+$('displayMode').onchange=render;$('newCard').onclick=()=>{if(!confirm('Create a new numbered card? Your current card will remain in the archive.'))return;let id=db.next||Math.max(...db.cards.map(c=>c.id))+1;db.next=id+1;db.cards.push(newCard(id));db.current=id;selected=0;previous=new Set();fullDone=false;persist();render()};
+$('testSound').onclick=()=>jingle();$('closeModal').onclick=()=> $('completeModal').classList.remove('show');
+$('backup').onclick=()=>{try{const payload={format:'sentence-bingo-backup',version:1,exportedAt:new Date().toISOString(),data:db};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='sentence-bingo-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url);toast('Backup exported. Keep the JSON file somewhere safe.')}catch(e){toast('Could not export backup.') }};
+$('restore').onclick=()=> $('backupFile').click();
+$('backupFile').onchange=async ev=>{const file=ev.target.files?.[0];if(!file)return;try{const raw=JSON.parse(await file.text()),incoming=raw.data||raw;if(!incoming||!Array.isArray(incoming.cards)||!incoming.cards.length)throw new Error('Invalid backup');const valid=incoming.cards.every(c=>Number.isInteger(c.id)&&Array.isArray(c.squares)&&c.squares.length===30&&c.squares.every(s=>s&&typeof s.sentence==='string'&&typeof s.keyword==='string'));if(!valid)throw new Error('Invalid card data');if(!confirm('Import this backup? It will replace the cards currently saved in this browser. Export your current cards first if you want to keep them.'))return;db={next:Math.max(Number(incoming.next)||1,...incoming.cards.map(c=>c.id+1)),current:incoming.cards.some(c=>c.id===incoming.current)?incoming.current:incoming.cards[0].id,cards:incoming.cards};selected=0;previous=new Set(bingoLines().map(x=>x.join(',')));fullDone=card().squares.every(filled);persist();render();toast('Backup restored.')}catch(e){toast('That file is not a valid Sentence Bingo backup.')}finally{ev.target.value=''}};
+previous=new Set(bingoLines().map(x=>x.join(',')));fullDone=card().squares.every(filled);render();
+})();
+</script></body></html>
