@@ -1,28 +1,13 @@
 # Sentence Bingo — 日本語作文ビンゴ
 
-A Japanese sentence-writing bingo app with a white and pale-pink theme.
+Japanese sentence-writing bingo, with three randomly selected station jingles.
 
 ## Publish with GitHub Pages
+Upload **all files in this folder** to the repository root, then go to **Settings → Pages** and select **Deploy from a branch**, branch `main`, folder `/(root)`.
 
-1. Create a GitHub repository named `sentence-bingo`.
-2. Upload **all files in this folder** to the repository root (not the folder itself).
-3. In the repository, open **Settings → Pages**.
-4. Choose **Deploy from a branch**.
-5. Select branch `main` and folder `/ (root)`, then save.
-6. GitHub Pages will show the published URL in the Pages settings.
-
-## Included files
-
+## Included
 - `index.html` — app
-- `icon.svg` — browser tab icon
-- `icon-192.png`, `icon-512.png` — installable/home-screen icon sizes
-- `manifest.webmanifest` — web app name, theme and icons
-- `README.md` — these instructions
+- `shinjuku_station_3.mp3`, `tokyo_station_3.mp3`, `akihabara_train_song.mp3` — randomly played bingo jingles
+- `icon.svg`, `icon-192.png`, `icon-512.png`, `manifest.webmanifest` — app icons and web manifest
 
-## Features
-
-5 × 6 sentence bingo, sentence and keyword entry, keyword selection, sentence read-aloud, numbered card archive, JSON backup/restore, sakura petal celebrations and original synthesized station-style jingles.
-
-## Data and audio
-
-Cards stay in browser local storage on the current device/browser; they do not sync automatically. Export a JSON backup regularly. Jingles are generated in-browser and are original tones, not recordings of actual Tokyo railway jingles. On mobile, tap **Test jingle** once to enable sound.
+Cards are stored in this browser's local storage. Export JSON backups from the app for safekeeping.
