@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sentence Bingo — 日本語作文ビンゴ</title>\n<link rel="icon" href="./icon.svg" type="image/svg+xml">\n<link rel="apple-touch-icon" href="./icon-192.png">\n<link rel="manifest" href="./manifest.webmanifest">\n<meta name="theme-color" content="#f8e4ed">
+<title>Sentence Bingo — 日本語作文ビンゴ</title>
 <style>
 :root{--rose:#b65f83;--pink:#f8e4ed;--pink2:#f3cbdc;--line:#efd6e1;--ink:#493943;--muted:#927b87}
 *{box-sizing:border-box}body{margin:0;background:#fffafb;color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Noto Sans JP",sans-serif}
@@ -46,8 +46,8 @@ textarea{min-height:112px;resize:vertical;font-size:1.05rem;line-height:1.6}
 <div class="field"><label for="editKeyword">Keyword / square label</label><input id="editKeyword" type="text" lang="ja" placeholder="Optional keyword"><div class="row" style="margin-top:8px"><button id="saveKeyword">Save keyword</button></div></div></div>
 </section>
 <section class="archive"><h3>Card archive</h3><div class="hint" style="margin:0 0 12px">Cards are saved on this device. Open an earlier card to revisit its sentences.</div><div id="archive" class="archive-list"></div></section>
-<div class="field" style="margin-top:18px"><label><input id="soundOn" type="checkbox" checked> Play original station-style jingle on bingo</label><div class="hint">Audio is synthesized in your browser. Tap “Test jingle” once to enable sound on mobile.</div><button id="testSound">Test jingle</button></div>
-</main><div class="petals" id="petals"></div><div class="toast" id="toast"></div><div class="modal" id="completeModal"><div class="modalbox"><h2>満開！ Full card complete!</h2><p>All 30 sentences are saved. おめでとうございます！</p><button id="closeModal" class="primary">Lovely!</button></div></div>
+<div class="field" style="margin-top:18px"><label><input id="soundOn" type="checkbox" checked> Play station jingle on bingo</label><div class="hint">Uses your uploaded MP3. Tap “Test jingle” to check playback.</div><button id="testSound">Test jingle</button></div>
+</main><audio id="bingoAudio" preload="auto" src="./shinjuku_station_3.mp3"></audio><div class="petals" id="petals"></div><div class="toast" id="toast"></div><div class="modal" id="completeModal"><div class="modalbox"><h2>満開！ Full card complete!</h2><p>All 30 sentences are saved. おめでとうございます！</p><button id="closeModal" class="primary">Lovely!</button></div></div>
 <script>
 (()=> {
 const $=id=>document.getElementById(id), STORE='sentenceBingoApp_v1';
@@ -67,7 +67,7 @@ function select(i){selected=i;render()}
 function selectUI(){let s=card().squares[selected];$('squareTitle').textContent=`Square ${selected+1} · ${filled(s)?'Filled':'Empty'}`;$('emptyEditor').hidden=filled(s);$('filledEditor').hidden=!filled(s);if(filled(s)){$('shownSentence').textContent=s.sentence;$('editKeyword').value=s.keyword||''}else{$('sentence').value='';$('keyword').value=''}}
 function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),2400)}
 function blossoms(count){const layer=$('petals');for(let i=0;i<count;i++){let p=document.createElement('i');p.className='petal';p.style.left=Math.random()*100+'%';p.style.setProperty('--drift',(Math.random()*220-110)+'px');p.style.animationDuration=(2.5+Math.random()*3)+'s';p.style.animationDelay=(Math.random()*.8)+'s';p.style.opacity=.45+Math.random()*.5;layer.append(p);setTimeout(()=>p.remove(),6500)}}
-function jingle(full=false){if(!$('soundOn').checked)return;try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();const now=audioCtx.currentTime,notes=full?[659.25,783.99,987.77,1174.66,987.77,1174.66,1567.98]:[587.33,739.99,880,1174.66];notes.forEach((f,i)=>{let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.setValueAtTime(f,now+i*.13);g.gain.setValueAtTime(.0001,now+i*.13);g.gain.exponentialRampToValueAtTime(full?.11:.09,now+i*.13+.018);g.gain.exponentialRampToValueAtTime(.0001,now+i*.13+(full?.27:.22));o.connect(g);g.connect(audioCtx.destination);o.start(now+i*.13);o.stop(now+i*.13+(full?.29:.24))})}catch(e){toast('Audio is unavailable in this browser.')}}
+function jingle(full=false){if(!$('soundOn').checked)return;const audio=$('bingoAudio');if(!audio)return;try{audio.pause();audio.currentTime=0;const p=audio.play();if(p&&typeof p.catch==='function')p.catch(()=>toast('Tap Test jingle once to enable audio.'))}catch(e){toast('Audio is unavailable in this browser.')}}
 function afterSave(){let c=card(),won=bingoLines(),now=new Set(won.map(x=>x.join(','))),newly=[...now].filter(x=>!previous.has(x));if(newly.length){newly.forEach(()=>jingle());blossoms(newly.length>1?60:32);toast(newly.length===1?'Bingo! 五つそろった！':`${newly.length} bingo lines!`)}previous=now;let complete=c.squares.every(filled);if(complete&&!fullDone){fullDone=true;c.completed=new Date().toISOString();jingle(true);blossoms(110);$('completeModal').classList.add('show')}persist();render()}
 $('useSelection').onclick=()=>{let el=$('sentence'),v=el.value.slice(el.selectionStart,el.selectionEnd).trim();if(v)$('keyword').value=v;else toast('Select a word or phrase in the sentence first.')};
 $('save').onclick=()=>{let v=$('sentence').value.trim();if(!v){toast('Enter a Japanese sentence first.');return}let s=card().squares[selected];s.sentence=v;s.keyword=$('keyword').value.trim();persist();afterSave()};
