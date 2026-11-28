@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sentence-bingo-pwa-v1';
+const CACHE_NAME = 'sentence-bingo-pwa-v3';
 const CORE_ASSETS = [
   './',
   './index.html',
